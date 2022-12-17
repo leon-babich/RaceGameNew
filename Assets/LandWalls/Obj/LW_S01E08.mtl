@@ -1,0 +1,25 @@
+newmtl AnanasMat
+Kd 1 1 1
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\Ananas01c.png
+illum 2
+
+newmtl GrassDry01
+Kd 1 1 1
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\GrassDry01.png
+illum 2
+
+newmtl RockLine01
+Kd 1 1 1
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\MyRockLine01.png
+map_Bump D:\Prog\Data\Projects\LandWalls\Walls\MyRockLine01_n.png
+illum 2
+
+newmtl RockRed
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\RockAlbedo_Red.png
+map_Bump D:\Prog\Data\Projects\LandWalls\Walls\RockNormal.png
+illum 2
+
+newmtl SandTile
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\Sand.png
+illum 2
+

@@ -1,0 +1,27 @@
+Landscape Wall Pack
+
+Introductory price, get them while they are cheap!
+
+Big pack (currently 33) of terrain meshes usefull for example for:
+
+Filling the space between your actual map and the skybox. You get nice 3d alternative to the 2d paralax effect.
+
+Making low poly low resource terrain map limited by rocky "walls"
+
+Adding terrain features to your existing terrain.
+
+Heaps of other uses :-)
+
+The "Walls" come in several styles, sizes and types (valley / hill)
+
+The meshes are low poly. Their performance cost is minimal.
+
+All meshes are split into 10 parts so you can use only part of them or even use the individual block to bild your own shapes
+
+Vegetation and rocks are separate meshes. They can be disabled if it suits your project.
+
+Enjoy,
+
+Kajaman
+
+http://kajaman.is-best.net  

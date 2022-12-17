@@ -1,0 +1,23 @@
+newmtl PineMat
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\MyPineTree04.png
+illum 2
+
+newmtl GrassGreen01
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\GrassGreen01.png
+illum 2
+
+newmtl RockLine01_gray
+Kd 1 1 1
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\MyRockLine01_gray.png
+map_Bump D:\Prog\Data\Projects\LandWalls\Walls\MyRockLine01_n.png
+illum 2
+
+newmtl Rock
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\RockAlbedo.png
+map_Bump D:\Prog\Data\Projects\LandWalls\Walls\RockNormal.png
+illum 2
+
+newmtl GrassTile
+map_Kd D:\Prog\Data\Projects\LandWalls\Walls\GrassGreen01.png
+illum 2
+

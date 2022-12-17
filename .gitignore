@@ -1,0 +1,12 @@
+/*
+!.gitignore
+![Aa]ssets/
+![Pp]rojectSettings/
+![Rr]oadArchitect/
+
+![Ll]ibrary
+[Ll]ibrary/*
+![Ll]ibrary/LastSceneManagerSetup.txt
+
+[Aa]ssets/**/*.cs.meta
+[Aa]ssets/RoadArchitect

@@ -13,10 +13,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform track2;
     private List<Transform> pathElementsShow = new List<Transform>();
     private Transform targetPoint;
-    private List<Vector3>[] pathElements = new List<Vector3>[4];
-    private List<Vector3> pathElementsMain = new List<Vector3>();
-    private List<Transform> pathElementsMainTransform = new List<Transform>();
-    private List<Transform>[] pathElementsMainTransform2 = new List<Transform>[4];
+    private List<Transform>[] pathElementsMain = new List<Transform>[4];
 
     public AudioClip soundMove;
     private AudioSource audioMove;
@@ -29,10 +26,11 @@ public class PlayerMovement : MonoBehaviour
     private ControlerTrack trackController = new ControlerTrack();
     private Turner turner = new Turner();
     private SimpleTimer timer = new SimpleTimer();
+    private MovingProccessor movingProccessor;
 
     static public float speed = 10f;
     private float speedMax = 50f;
-    private float speedStart = 30f;
+    private float speedStart = 15f;
     public float speedIncrease = 2.0f;
     public float speedDecrease = 4.0f;
     private float speedTurnMax = 2f;
@@ -50,9 +48,6 @@ public class PlayerMovement : MonoBehaviour
 
     bool isTurnLeft;
     bool isTurnRight;
-
-    bool isTestMarkers = false;
-    bool isTestMoving = false;
     public enum TypeProcess { TestMoving, TestMarkers, TestGame };
     public TypeProcess typeProcess = TypeProcess.TestMoving;
 
@@ -160,90 +155,38 @@ public class PlayerMovement : MonoBehaviour
         speed = speedStart;
 
         List<Vector3> markersTrack = new List<Vector3>();
-        for(int i=0; i<pathElements.Length; i++) {
-            pathElements[i] = new List<Vector3>(); 
+
+        for (int i = 0; i < pathElementsMain.Length; i++) {
+            pathElementsMain[i] = new List<Transform>();
         }
-        for (int i = 0; i < pathElementsMainTransform2.Length; i++) {
-            pathElementsMainTransform2[i] = new List<Transform>();
-        }
+
         for (int i = 0; i<track.childCount; i++) {
             Vector3 newVec1 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 7.5f, -1);
             Transform newTransform1 = Instantiate(track.GetChild(i), newVec1, Quaternion.identity);
-            pathElements[0].Add(newVec1);
-            pathElementsMainTransform2[0].Add(newTransform1);
+            pathElementsMain[0].Add(newTransform1);
 
             Vector3 newVec2 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 2.5f, -1);
-            //Vector3 newVec2 = track.GetChild(i).position;
             Transform newTransform2 = Instantiate(track.GetChild(i), newVec2, Quaternion.identity);
-            pathElements[1].Add(newVec2);
-            pathElementsMainTransform2[1].Add(newTransform2);
+            pathElementsMain[1].Add(newTransform2);
 
             Vector3 newVec3 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 2.5f, 1);
             Transform newTransform3 = Instantiate(track.GetChild(i), newVec3, Quaternion.identity);
-            pathElements[2].Add(newVec3);
-            pathElementsMainTransform2[2].Add(newTransform3);
+            pathElementsMain[2].Add(newTransform3);
 
             Vector3 newVec4 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 7.5f, 1);
             Transform newTransform4 = Instantiate(track.GetChild(i), newVec4, Quaternion.identity);
-            pathElements[3].Add(newVec4);
-            pathElementsMainTransform2[3].Add(newTransform4);
+            pathElementsMain[3].Add(newTransform4);
 
-            //pathElementsShow.Add(newTransform3);
             markersTrack.Add(newVec3);
-            //pathElementsMain.Add(track.GetChild(i).position);
-            //pathElementsMainTransform.Add(track.GetChild(i));
-            pathElementsMainTransform.Add(newTransform4);
         }
 
         targetPoint = Instantiate(track.GetChild(0), m_transform.position, Quaternion.identity);
 
-        for (int i=0; i<pathElements.Length; i++) {
-            trackController.setMarkersTrack(pathElements[i], i);
-        }
-
-        //turner.setStartAngle(transform.rotation.eulerAngles.y);
-        //float ang = RotationCounter.getNewDirection(transform.position, trackController.getCurrentMarker(), transform.rotation.eulerAngles.y);
-        //turner.setTarget(ang, transform.rotation.eulerAngles.y);
-
-        //transform.position = pathElements[2][0];
-        movingProccessor = new MovingProccessor(m_transform.position, pathElementsMainTransform, pathElementsMainTransform2);
-        //movingProccessor.setLeftTrack();
-        movingProccessor.setTrack(1);
-        movingProccessor.startProcess();
-        //TEST
-        //Vector3[] targets = movingProccessor.getAllTargets();
-        //for (int i = 0; i < targets.Length; i++) {
-        //    Transform newTransform = Instantiate(track2.GetChild(0), targets[i], Quaternion.identity);
-        //    pathElementsShow.Add(newTransform);
-        //}
-
-        //if(typeProcess == TypeProcess.TestMarkers) {
-        //    while (movingProccessor.setNext()) {
-        //        targets = movingProccessor.getAllTargets();
-        //        for (int i = 0; i < targets.Length; i++) {
-        //            Transform newTransform = Instantiate(track2.GetChild(0), targets[i], Quaternion.identity);
-        //            pathElementsShow.Add(newTransform);
-        //        }
-        //    }
-
-        //    movingProccessor.restart();
-        //}
-        //
+        movingProccessor = new MovingProccessor(m_transform.position, pathElementsMain);
     }
 
-    void debugTest()
-    {
-        string str = "Track markers: ";
-        //for (int i = 0; i<markersTrack.Count; i++) {
-        //    str += markersTrack[i].z + " ";
-        //}
-        Debug.Log(str);
-    }
-
-    bool isTest = true;
-    bool isTestPath = true;
-    int numPath = 0;
     bool isSetTestMarkers = true;
+
     void Update()
     {
         if(typeProcess == TypeProcess.TestGame) {
@@ -287,6 +230,7 @@ public class PlayerMovement : MonoBehaviour
             if (isSetTestMarkers) {
                 do {
                     Vector3[] targets = movingProccessor.getAllTargets();
+
                     for (int i = 0; i < targets.Length; i++) {
                         Transform newTransform = Instantiate(track2.GetChild(0), targets[i], Quaternion.identity);
                         pathElementsShow.Add(newTransform);
@@ -300,20 +244,6 @@ public class PlayerMovement : MonoBehaviour
 
         //testMoving();
         //testDraw();
-
-        //Test
-        //if (Input.GetKey("t") && isTest) {
-        //    debugTest();
-        //    isTest = false;
-        //} else if (!Input.GetKey("t")) isTest = true;
-
-        
-        //if (Input.GetKey("e") && isTestPath) {
-        //    trackController.setCurrentPath(numPath++);
-        //    if (numPath >= pathElements.Length) numPath = 0;
-        //    isTestPath = false;
-        //} else if (!Input.GetKey("e")) isTestPath = true;
-        //
 
         for (int i = 0; i < listTimerCollisions.Count; i++) {
             if(listTimerCollisions[i].isProcess()) {
@@ -353,7 +283,6 @@ public class PlayerMovement : MonoBehaviour
                 tarAng = tarAng < 0 ? 360 + tarAng : tarAng;
                 Quaternion turnTo = Quaternion.Euler(0, tarAng, 0);
                 body.transform.rotation = Quaternion.Lerp(transform.rotation, turnTo, speedTurn * t);
-                Debug.Log("Target angle: " + tarAng + ". Current angle: " + curAng);
             }
             else if (isTurnRight) {
                 curAng = m_transform.rotation.eulerAngles.y;
@@ -366,56 +295,14 @@ public class PlayerMovement : MonoBehaviour
             body.MovePosition(transform.position + transform.TransformDirection(Vector3.forward * speed * t));
         }
 
-        //New
-        //if (turner.turn == Turner.Turn.Left) {
-        //    Quaternion turnTo = Quaternion.Euler(0, turner.getTarget(), 0);
-        //    body.transform.rotation = Quaternion.Lerp(transform.rotation, turnTo, turner.turnSpeed * t);
-        //}
-        //else if (turner.turn == Turner.Turn.Right) {
-        //    Quaternion turnTo = Quaternion.Euler(0, turner.getTarget(), 0);
-        //    body.transform.rotation = Quaternion.Lerp(transform.rotation, turnTo, turner.turnSpeed * t);
-        //}
-
-        //turner.checkReady(transform.rotation.eulerAngles.y);
-
-        //body.MovePosition(transform.position + transform.TransformDirection(Vector3.forward * speed * t));
-        ////
-
-        //body.MovePosition(transform.position + Vector3.forward * speed * t);
         //body.AddForce(Vector3.forward * speed * t, ForceMode.VelocityChange);
     }
 
-    float t = 0;
-    int n = 4;
-    int currentTargetPoint = 0;
     float m_graund = 0;
-    MovingProccessor movingProccessor;
 
     void testMoving()
     {
         float t = Time.fixedDeltaTime;
-        //if(speed < 30) {
-        //    increaseSpeed();
-        //}
-
-        //if(trackController.checkDistance(transform.position)) {
-        //    float ang = RotationCounter.getNewDirection(transform.position, trackController.getCurrentMarker(), transform.rotation.eulerAngles.y);
-        //    turner.setTarget(ang, transform.rotation.eulerAngles.y);
-        //}
-
-        //float timeMove = n * 3f;
-        //float timeMove = speed;
-        //t += Time.deltaTime / timeMove;
-        //if (t >= 1f) {
-        //    t = 0;
-        //    currentTargetPoint += n;
-        //}
-        //Vector3[] points = new Vector3[n];
-        //for (int i = currentTargetPoint, j = 0; i < (currentTargetPoint + n); i++, j++) points[j] = pathElements[2][i];
-        //float t = Bezier.GetParameterT(transform.position, points);
-        //transform.position = Bezier.GetPoint(t, points);
-        //transform.rotation = Quaternion.LookRotation(Bezier.GetRotation(t, points));
-
 
         Vector3 dir = movingProccessor.getTarget() - m_transform.position;
         if(movingProccessor.getTarget().y >= m_transform.position.y) dir.y = m_graund;
@@ -475,36 +362,27 @@ class MovingProccessor
     Vector3 currentPos;
     Vector3 targetPos;
     Vector3 startPos;
-    List<Transform> listMarker = new List<Transform>();
-    List<Transform>[] listMarker2 = new List<Transform>[4];
+    List<Transform>[] listMarker = new List<Transform>[4];
     List<Vector3> targets = new List<Vector3>();
     int countDiv = 15;
-    int countMarkers = 0;
+    int counterMarker = 0;
     int countMarkersRemember = 0;
     int countTarget = 0;
-    int track = 3;
+    int track = 1;
     bool isStop = false;
 
-    public MovingProccessor(Vector3 pos, List<Transform> list, List<Transform>[] list2)
+    public MovingProccessor(Vector3 pos, List<Transform>[] list)
     {
         listMarker = list;
-        listMarker2 = list2;
         typeMove = TypeMove.Directly;
-        //Debug.Log("Point for left traffic");
-        //for (int i = 0; i < list2[0].Count; i++) {
-        //    Debug.Log("Point " + i + ": " + list2[0][i].position);
-        //}
-
-        //recountTargets();
 
         startPos = currentPos = pos;
-        //targetPos = targets[countTarget];
+        startProcess();
     }
 
-    public void startProcess()
+    void startProcess()
     {
-        Debug.Log("Set traffic: " + track);
-        recountTargets();
+        setTargets();
 
         targetPos = targets[countTarget];
     }
@@ -537,8 +415,6 @@ class MovingProccessor
     public void changeTrafficLane(Vector3 pos, bool isRight)
     {
         if ((isRight && track >= 3) || (!isRight && track <= 0)) {
-            string strDir = isRight ? "left" : "right";
-            Debug.Log("Traffic can not move " + strDir);
             return;
         }
 
@@ -546,12 +422,11 @@ class MovingProccessor
         recountTargetsChangeTraffic();
         currentPos = pos;
         targetPos = targets[countTarget];
-        //Debug.Log("Set traffic: " + track + ". Next target: " + targetPos);
     }
 
     public void setTrack(int n)
     {
-        if (n >= 0 && n < listMarker2.Length) track = n;
+        if (n >= 0 && n < listMarker.Length) track = n;
     }
 
     public bool setNext()
@@ -560,7 +435,7 @@ class MovingProccessor
 
         if (++countTarget >= targets.Count) {
             countTarget = 0;
-            recountTargets();
+            setTargets();
 
             if (targets.Count == 0) {
                 Debug.Log("Warning! The track is over");
@@ -580,15 +455,15 @@ class MovingProccessor
         targets.Clear();
 
         if (typeMove == TypeMove.Directly) {
-            for (int i = countMarkersRemember; i < countMarkers; i++) {
-                if (listMarker2[track][i].tag != "UnusedMarker") targets.Add(listMarker2[track][i].position);
+            for (int i = countMarkersRemember; i < counterMarker; i++) {
+                if (listMarker[track][i].tag != "UnusedMarker") targets.Add(listMarker[track][i].position);
             }
         }
         else if (typeMove == TypeMove.Sinuous) {
             List<Vector3> tempList = new List<Vector3>();
 
-            for (int i = countMarkersRemember; i < countMarkers; i++) {
-                if (listMarker2[track][i].tag != "UnusedMarker") tempList.Add(listMarker2[track][i].position);
+            for (int i = countMarkersRemember; i < counterMarker; i++) {
+                if (listMarker[track][i].tag != "UnusedMarker") tempList.Add(listMarker[track][i].position);
             }
 
             if (tempList.Count < 10 && tempList.Count >= 3) {
@@ -606,92 +481,42 @@ class MovingProccessor
         }
     }
 
-    void recountTargets()
+    void setTargets()
     {
-        //Debug.Log("Start calling recountTargets");
         targets.Clear();
-        countMarkersRemember = countMarkers;
+        countMarkersRemember = counterMarker;
 
-        if (listMarker2[track].Count <= countMarkers) return;
+        if (listMarker[track].Count <= counterMarker) return;
 
-        typeMove = listMarker2[track][countMarkers].tag == "TurnMarker" ? TypeMove.Sinuous : TypeMove.Directly;
+        typeMove = listMarker[track][counterMarker].tag == "TurnMarker" ? TypeMove.Sinuous : TypeMove.Directly;
 
         if (typeMove == TypeMove.Directly) {
-            //Debug.Log("Entering into TypeMove: directly");
-            while (countMarkers < listMarker2[track].Count && listMarker2[track][countMarkers].tag != "TurnMarker") {
-                if(listMarker2[track][countMarkers].tag != "UnusedMarker") targets.Add(listMarker2[track][countMarkers].position);
-                countMarkers++;
+            while (counterMarker < listMarker[track].Count && listMarker[track][counterMarker].tag != "TurnMarker") {
+                if (listMarker[track][counterMarker].tag != "UnusedMarker") targets.Add(listMarker[track][counterMarker].position);
+                counterMarker++;
             }
-
-            //if (countMarkers >= listMarker2[track].Count) isStop = true;
-
-            //if (targets.Count == 0 && listMarker2[track][countMarkers].tag == "TurnMarker") {
-            //    typeMove = TypeMove.Sinuous;
-            //    recountTargets();
-            //}
-
-            //typeMove = TypeMove.Sinuous;
         }
         else if (typeMove == TypeMove.Sinuous) {
-            //do {
-            //    countSinous();
-            //}
-            //while (listMarker2[track][countMarkers].tag != "TurnMarker");
-
-            List<Vector3> tempList = new List<Vector3>();
-
-            if (countMarkers > 0 && listMarker2[track][countMarkers - 1].tag == "StartTurn") tempList.Add(listMarker2[track][countMarkers - 1].position);
-
-            while (countMarkers < listMarker2[track].Count && listMarker2[track][countMarkers].tag != "EndTurn" && listMarker2[track][countMarkers].tag != "StartTurn" && listMarker2[track][countMarkers].tag != "Untagged") {
-                //while (countMarkers < listMarker2[track].Count && (listMarker2[track][countMarkers].tag == "TurnMarker" || listMarker2[track][countMarkers].tag == "UnusedMarker")) {
-                if (listMarker2[track][countMarkers].tag != "UnusedMarker") tempList.Add(listMarker2[track][countMarkers].position);
-                countMarkers++;
-            }
-
-            if (countMarkers < listMarker2[track].Count && (listMarker2[track][countMarkers].tag == "EndTurn" || listMarker2[track][countMarkers].tag == "StartTurn")) tempList.Add(listMarker2[track][countMarkers++].position);
-
-            //typeMove = TypeMove.Directly;
-
-            if (tempList.Count < 10 && tempList.Count >= 3) {
-                float t = 0f;
-                for (int i = 0; i < countDiv; i++, t += 1.0f / countDiv) {
-                    targets.Add(Bezier.GetPoint(t, tempList.ToArray()));
-                }
-                targets.Add(Bezier.GetPoint(1f, tempList.ToArray()));
-            }
-            else {
-                for (int i = 0; i < tempList.Count; i++) {
-                    targets.Add(tempList[i]);
-                }
-            }
-
-
-            //if (targets.Count == 0 && !isStop && countMarkers < listMarker2[track].Count) {
-            //    targets.Add(listMarker2[track][countMarkers++].position);
-            //}
+            countSinous();
         }
-
-        //if (countMarkers >= listMarker2[track].Count) isStop = true;
-
-        //Debug.Log("Calling recountTargets. Targets: " + targets.Count);
     }
 
     void countSinous()
     {
         List<Vector3> tempList = new List<Vector3>();
 
-        //if(countMarkers > 0 && listMarker2[track][countMarkers-1].tag == "EndTurn") tempList.Add(listMarker2[track][countMarkers-1].position);
+        if (counterMarker > 0 && listMarker[track][counterMarker - 1].tag == "StartTurn") tempList.Add(listMarker[track][counterMarker - 1].position);
 
-        while (countMarkers < listMarker2[track].Count && listMarker2[track][countMarkers].tag != "EndTurn" && listMarker2[track][countMarkers].tag != "Untagged") {
-            if (listMarker2[track][countMarkers].tag != "UnusedMarker") tempList.Add(listMarker2[track][countMarkers].position);
-            countMarkers++;
+        while (counterMarker < listMarker[track].Count && listMarker[track][counterMarker].tag != "EndTurn" && listMarker[track][counterMarker].tag != "StartTurn" && listMarker[track][counterMarker].tag != "Untagged") {
+            if (listMarker[track][counterMarker].tag != "UnusedMarker") tempList.Add(listMarker[track][counterMarker].position);
+            counterMarker++;
         }
 
-        if (countMarkers >= listMarker2[track].Count) isStop = true;
-        else if (listMarker2[track][countMarkers].tag == "EndTurn") tempList.Add(listMarker2[track][countMarkers++].position);
+        if (counterMarker < listMarker[track].Count && (listMarker[track][counterMarker].tag == "EndTurn" || listMarker[track][counterMarker].tag == "StartTurn")) tempList.Add(listMarker[track][counterMarker++].position);
 
-        if (tempList.Count < 10 && tempList.Count >= 2) {
+        if (tempList.Count < 10 && tempList.Count >= 3) {
             float t = 0f;
+
             for (int i = 0; i < countDiv; i++, t += 1.0f / countDiv) {
                 targets.Add(Bezier.GetPoint(t, tempList.ToArray()));
             }
@@ -707,11 +532,11 @@ class MovingProccessor
     public void restart()
     {
         typeMove = TypeMove.Directly;
-        countMarkers = 0;
+        counterMarker = 0;
         countTarget = 0;
         isStop = false;
 
-        recountTargets();
+        setTargets();
 
         currentPos = startPos;
         targetPos = targets[countTarget];

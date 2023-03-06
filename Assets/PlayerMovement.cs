@@ -10,10 +10,8 @@ public class PlayerMovement : MonoBehaviour
     private Transform m_transform;
     public GameObject explosionPrefab;
     public Transform track;
-    public Transform track2;
     private List<Transform> pathElementsShow = new List<Transform>();
     private Transform targetPoint;
-    private List<Transform>[] pathElementsMain = new List<Transform>[4];
 
     public AudioClip soundMove;
     private AudioSource audioMove;
@@ -154,35 +152,9 @@ public class PlayerMovement : MonoBehaviour
 
         speed = speedStart;
 
-        List<Vector3> markersTrack = new List<Vector3>();
-
-        for (int i = 0; i < pathElementsMain.Length; i++) {
-            pathElementsMain[i] = new List<Transform>();
-        }
-
-        for (int i = 0; i<track.childCount; i++) {
-            Vector3 newVec1 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 7.5f, -1);
-            Transform newTransform1 = Instantiate(track.GetChild(i), newVec1, Quaternion.identity);
-            pathElementsMain[0].Add(newTransform1);
-
-            Vector3 newVec2 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 2.5f, -1);
-            Transform newTransform2 = Instantiate(track.GetChild(i), newVec2, Quaternion.identity);
-            pathElementsMain[1].Add(newTransform2);
-
-            Vector3 newVec3 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 2.5f, 1);
-            Transform newTransform3 = Instantiate(track.GetChild(i), newVec3, Quaternion.identity);
-            pathElementsMain[2].Add(newTransform3);
-
-            Vector3 newVec4 = RotationCounter.getShiftMarker(track.GetChild(i).position, track.GetChild(i).rotation.eulerAngles.y, 7.5f, 1);
-            Transform newTransform4 = Instantiate(track.GetChild(i), newVec4, Quaternion.identity);
-            pathElementsMain[3].Add(newTransform4);
-
-            markersTrack.Add(newVec3);
-        }
-
         targetPoint = Instantiate(track.GetChild(0), m_transform.position, Quaternion.identity);
 
-        movingProccessor = new MovingProccessor(m_transform.position, pathElementsMain);
+        movingProccessor = new MovingProccessor(m_transform.position, TrackCreator.pathElementsMain);
     }
 
     bool isSetTestMarkers = true;
@@ -232,7 +204,7 @@ public class PlayerMovement : MonoBehaviour
                     Vector3[] targets = movingProccessor.getAllTargets();
 
                     for (int i = 0; i < targets.Length; i++) {
-                        Transform newTransform = Instantiate(track2.GetChild(0), targets[i], Quaternion.identity);
+                        Transform newTransform = Instantiate(track.GetChild(0), targets[i], Quaternion.identity);
                         pathElementsShow.Add(newTransform);
                     }
                 }
@@ -320,7 +292,7 @@ public class PlayerMovement : MonoBehaviour
             //Test
             Vector3[] targets = movingProccessor.getAllTargets();
             for (int i = 0; i < targets.Length; i++) {
-                Transform newTransform = Instantiate(track2.GetChild(0), targets[i], Quaternion.identity);
+                Transform newTransform = Instantiate(track.GetChild(0), targets[i], Quaternion.identity);
                 pathElementsShow.Add(newTransform);
             }
             //
